@@ -2,7 +2,7 @@ from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel
 from typing import List, Optional
 import uvicorn
-from datetime import datetime
+from datetime import datetime, timezone
 
 app = FastAPI(title="AWS Microservice - Todo API", version="1.0.0")
 
@@ -29,7 +29,7 @@ def create_todo(todo: Todo):
     global todo_counter
     new_todo = todo.model_copy()
     new_todo.id = todo_counter
-    new_todo.created_at = datetime.utcnow()
+    new_todo.created_at = datetime.now(timezone.utc)
     todos.append(new_todo)
     todo_counter += 1
     return new_todo
@@ -62,7 +62,7 @@ def delete_todo(todo_id: int):
 
 @app.get("/health")
 def health_check():
-    return {"status": "healthy", "service": "todo-api", "timestamp": datetime.utcnow().isoformat()}
+    return {"status": "healthy", "service": "todo-api", "timestamp": datetime.now(timezone.utc).isoformat()}
 
 if __name__ == "__main__":
     uvicorn.run(app, host="0.0.0.0", port=8000)
